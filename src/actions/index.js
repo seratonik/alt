@@ -12,11 +12,12 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
 
   // the action itself
   const action = (...args) => {
+    let inject
     // check for action's implementation metadata if dispatch should be injected
     // for example when decorated via @Reflect.metadata
     // (https://github.com/rbuckton/ReflectDecorators#syntax)
     if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
-      const inject = Reflect.getOwnMetadata('alt:injectDispatch', implementation)
+      inject = Reflect.getOwnMetadata('alt:injectDispatch', implementation)
 
       if (inject === true) {
         // diff number of declared arguments and number of passed in arguments
@@ -43,7 +44,9 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
         // inner function result should be returned as an action result
         actionResult = invocationResult(dispatch, alt)
       } else {
-        dispatch(invocationResult)
+        if (!inject) {
+          dispatch(invocationResult)
+        }
       }
     }
 
