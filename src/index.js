@@ -134,6 +134,17 @@ class Alt {
         return
       }
 
+      // Don't make an action out of method/function with
+      // "alt:skipMakeAction" metadata (via @Reflect.metadata decorator)
+      if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
+        const skip = Reflect.getOwnMetadata('alt:skipMakeAction', action)
+
+        if (skip === true) {
+          exportObj[actionName] = action
+          return
+        }
+      }
+
       // create the action
       exportObj[actionName] = makeAction(
         this,

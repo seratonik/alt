@@ -12,7 +12,30 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
 
   // the action itself
   const action = (...args) => {
+    let inject
+    // check for action's implementation metadata if dispatch should be injected
+    // for example when decorated via @Reflect.metadata
+    // (https://github.com/rbuckton/ReflectDecorators#syntax)
+    if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
+      inject = Reflect.getOwnMetadata('alt:injectDispatch', implementation)
+
+      if (inject === true) {
+        // diff number of declared arguments and number of passed in arguments
+        const diff = implementation.length - args.length
+
+        if (diff > 0) {
+          const optionalArgs = Array.apply(null, Array(diff))
+          // explicitely pass optional parameters as undefined
+          args.push.apply(args, optionalArgs)
+        }
+
+        // pass dispatch as the n+1 th parameter to action implementation
+        args.push(dispatch)
+      }
+    }
+
     const invocationResult = implementation.apply(obj, args)
+
     let actionResult = invocationResult
 
     // async functions that return promises should not be dispatched
@@ -21,7 +44,9 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
         // inner function result should be returned as an action result
         actionResult = invocationResult(dispatch, alt)
       } else {
-        dispatch(invocationResult)
+        if (!inject) {
+          dispatch(invocationResult)
+        }
       }
     }
 
@@ -34,6 +59,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   action.defer = (...args) => setTimeout(() => action.apply(null, args))
   action.id = id
   action.data = data
+  action.dispatch = dispatch
 
   // ensure each reference is unique in the namespace
   const container = alt.actions[namespace]
