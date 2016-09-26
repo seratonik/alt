@@ -1228,7 +1228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function getInternalMethods(Obj, isProto) {
 	    const excluded = isProto ? builtInProto : builtIns;
-	    const obj = isProto ? Obj.prototype : Obj;
+	    const obj = isProto && typeof Obj === 'function' ? Obj.prototype : Obj;
 	    return Object.getOwnPropertyNames(obj).reduce((value, m) => {
 	      if (excluded.indexOf(m) !== -1) {
 	        return value;
@@ -1240,7 +1240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  function getPrototypeChain(Obj, methods = {}) {
-	    return Obj === Function.prototype ? methods : getPrototypeChain(Object.getPrototypeOf(Obj), fn.assign(getInternalMethods(Obj, true), methods));
+	    return Obj === Object.prototype ? methods : getPrototypeChain(Object.getPrototypeOf(typeof Obj === 'function' ? Obj.prototype : Obj), fn.assign(getInternalMethods(Obj, true), methods));
 	  }
 
 	  function warn(msg) {
