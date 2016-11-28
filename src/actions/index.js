@@ -6,7 +6,14 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   const id = utils.uid(alt._actionsRegistry, `${namespace}.${name}`)
   alt._actionsRegistry[id] = 1
 
-  const data = { id, namespace, name }
+
+  let logAs
+  // Set action's log level
+  if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
+    logAs = Reflect.getOwnMetadata('alt:meta:logAs', implementation)
+  }
+
+  const data = { id, namespace, name, logAs }
 
   const dispatch = (payload) => alt.dispatch(id, payload, data)
 
