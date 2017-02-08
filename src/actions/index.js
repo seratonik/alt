@@ -57,7 +57,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
       }
     }
 
-    if (invocationResult === undefined) {
+    if (!inject && invocationResult === undefined) {
       utils.warn('An action was called but nothing was dispatched')
     }
 
