@@ -61,8 +61,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -104,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Alt = function () {
 	  function Alt() {
-	    var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
 	    _classCallCheck(this, Alt);
 
@@ -231,7 +229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function createActions(ActionsClass) {
 	      var _this3 = this;
 
-	      var exportObj = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      var exportObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	      var actions = {};
 	      var key = utils.uid(this._actionsRegistry, ActionsClass.displayName || ActionsClass.name || 'Unknown');
@@ -950,8 +948,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -991,7 +987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function snapshot(instance) {
-	  var storeNames = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+	  var storeNames = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
 	  var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
 	  return stores.reduce(function (obj, storeHandle) {
@@ -1026,8 +1022,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ },
 /* 7 */
 /***/ function(module, exports) {
-
-	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1067,8 +1061,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ },
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1285,8 +1277,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -1327,7 +1317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function getPrototypeChain(Obj) {
-	  var methods = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var methods = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	  return Obj === Object.prototype ? methods : getPrototypeChain(Object.getPrototypeOf(typeof Obj === 'function' ? Obj.prototype : Obj), fn.assign(getInternalMethods(Obj, true), methods));
 	}
@@ -1406,8 +1396,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1529,9 +1517,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (!fn.isFunction(cb)) throw new TypeError('listen expects a function');
 
-	      var _transmitter$subscrib = this.transmitter.subscribe(cb);
-
-	      var dispose = _transmitter$subscrib.dispose;
+	      var _transmitter$subscrib = this.transmitter.subscribe(cb),
+	          dispose = _transmitter$subscrib.dispose;
 
 	      this.subscriptions.push({ cb: cb, dispose: dispose });
 	      return function () {
@@ -1630,8 +1617,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ },
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1873,8 +1858,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -1959,7 +1942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    if (invocationResult === undefined) {
+	    if (!inject && invocationResult === undefined) {
 	      utils.warn('An action was called but nothing was dispatched');
 	    }
 
