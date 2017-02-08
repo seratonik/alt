@@ -1886,13 +1886,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var id = utils.uid(alt._actionsRegistry, String(namespace) + '.' + String(name));
 	  alt._actionsRegistry[id] = 1;
 
-	  var logAs = void 0;
+	  var logAs = void 0,
+	      getStoreStateToLog = void 0;
 	  // Set action's log level
 	  if ((typeof Reflect === 'undefined' ? 'undefined' : _typeof(Reflect)) === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
 	    logAs = Reflect.getOwnMetadata('alt:meta:logAs', implementation);
 	  }
+	  // Set action's additional store state data
+	  if ((typeof Reflect === 'undefined' ? 'undefined' : _typeof(Reflect)) === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
+	    getStoreStateToLog = Reflect.getOwnMetadata('alt:meta:getStoreStateToLog', implementation);
+	  }
 
-	  var data = { id: id, namespace: namespace, name: name, logAs: logAs };
+	  var data = { id: id, namespace: namespace, name: name, logAs: logAs, getStoreStateToLog: getStoreStateToLog };
 
 	  var dispatch = function dispatch(payload) {
 	    return alt.dispatch(id, payload, data);
