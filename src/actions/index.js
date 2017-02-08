@@ -7,13 +7,20 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   alt._actionsRegistry[id] = 1
 
 
-  let logAs
+  let logAs, getStoreStateToLog
   // Set action's log level
   if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
     logAs = Reflect.getOwnMetadata('alt:meta:logAs', implementation)
   }
+  // Set action's additional store state data
+  if (typeof Reflect === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
+    getStoreStateToLog = Reflect.getOwnMetadata(
+      'alt:meta:getStoreStateToLog',
+      implementation
+    )
+  }
 
-  const data = { id, namespace, name, logAs }
+  const data = { id, namespace, name, logAs, getStoreStateToLog }
 
   const dispatch = (payload) => alt.dispatch(id, payload, data)
 
