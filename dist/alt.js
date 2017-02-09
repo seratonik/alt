@@ -1887,17 +1887,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  alt._actionsRegistry[id] = 1;
 
 	  var logAs = void 0,
-	      getStoreStateToLog = void 0;
+	      storeStateToLog = void 0;
 	  // Set action's log level
 	  if ((typeof Reflect === 'undefined' ? 'undefined' : _typeof(Reflect)) === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
 	    logAs = Reflect.getOwnMetadata('alt:meta:logAs', implementation);
 	  }
 	  // Set action's additional store state data
 	  if ((typeof Reflect === 'undefined' ? 'undefined' : _typeof(Reflect)) === 'object' && fn.isFunction(Reflect.getOwnMetadata)) {
-	    getStoreStateToLog = Reflect.getOwnMetadata('alt:meta:getStoreStateToLog', implementation);
+	    storeStateToLog = Reflect.getOwnMetadata('alt:meta:storeStateToLog', implementation);
 	  }
 
-	  var data = { id: id, namespace: namespace, name: name, logAs: logAs, getStoreStateToLog: getStoreStateToLog };
+	  var data = { id: id, namespace: namespace, name: name, logAs: logAs, storeStateToLog: storeStateToLog };
 
 	  var dispatch = function dispatch(payload) {
 	    return alt.dispatch(id, payload, data);
