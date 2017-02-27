@@ -1,5 +1,21 @@
 # alt
 
+## NOTE - odogono/alt
+
+A fork of SpaceKnow/alt, with a new build target added, which creates a single file alt.es6.js file with minimal babel transforms.
+
+This was done because I wanted to use es classes throughout, without having to deal with:
+
+```
+TypeError: Class constructor AppActions cannot be invoked without 'new'
+```
+
+which occured when attempting to use classes with the transpiled alt code.
+
+
+----
+
+
 Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. For a high-level walk-through on flux, take a look at the [Getting Started](http://alt.js.org/guide/) guide. What follows below applies only to the master branch of `alt` and not the latest distribution. Any questions? ask in the gitter room.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/goatslacker/alt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
