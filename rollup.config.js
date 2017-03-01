@@ -19,7 +19,8 @@ let Config = {
             exclude: 'node_modules/**',
             plugins:[
                 'transform-class-properties',
-                'transform-object-rest-spread'
+                'transform-object-rest-spread',
+                'transform-es2015-shorthand-properties'
             ]
         })
     ]

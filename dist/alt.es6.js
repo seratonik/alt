@@ -323,7 +323,7 @@ function setAppState(instance, data, onStore) {
   eachObject((key, value) => {
     const store = instance.stores[key];
     if (store) {
-      const { config } = store.StoreModel;
+      const { config: config } = store.StoreModel;
       const state = store.state;
       if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
       if (isMutableObject(state)) {
@@ -342,7 +342,7 @@ function snapshot(instance, storeNames = []) {
   return stores.reduce((obj, storeHandle) => {
     const storeName = storeHandle.displayName || storeHandle;
     const store = instance.stores[storeName];
-    const { config } = store.StoreModel;
+    const { config: config } = store.StoreModel;
     store.lifecycle('snapshot');
     const customSnapshot = config.onSerialize && config.onSerialize(store.state);
     obj[storeName] = customSnapshot ? customSnapshot : store.getState();
@@ -422,16 +422,16 @@ function dispatchIdentity(x, ...a) {
 
 function fsa(id, type, payload, details) {
   return {
-    type,
-    payload,
+    type: type,
+    payload: payload,
     meta: _extends({
       dispatchId: id
     }, details),
 
-    id,
+    id: id,
     action: type,
     data: payload,
-    details
+    details: details
   };
 }
 
@@ -442,7 +442,7 @@ function dispatch(id, actionObj, payload, alt) {
   const type = actionObj.id;
   const namespace = type;
   const name = type;
-  const details = { id: type, namespace, name };
+  const details = { id: type, namespace: namespace, name: name };
 
   const dispatchLater = x => alt.dispatch(type, x, details);
 
@@ -534,7 +534,7 @@ class AltStore {
         if (model.handlesOwnErrors) {
           this.lifecycle('error', {
             error: e,
-            payload,
+            payload: payload,
             state: this.state
           });
           return false;
@@ -551,7 +551,7 @@ class AltStore {
       this.preventDefault = false;
 
       this.lifecycle('beforeEach', {
-        payload,
+        payload: payload,
         state: this.state
       });
 
@@ -584,7 +584,7 @@ class AltStore {
       }
 
       this.lifecycle('afterEach', {
-        payload,
+        payload: payload,
         state: this.state
       });
     });
@@ -594,8 +594,8 @@ class AltStore {
 
   listen(cb) {
     if (!isFunction(cb)) throw new TypeError('listen expects a function');
-    const { dispose } = this.transmitter.subscribe(cb);
-    this.subscriptions.push({ cb, dispose });
+    const { dispose: dispose } = this.transmitter.subscribe(cb);
+    this.subscriptions.push({ cb: cb, dispose: dispose });
     return () => {
       this.lifecycle('unlisten');
       dispose();
@@ -613,7 +613,7 @@ class AltStore {
 }
 
 const StoreMixin = {
-  waitFor(...sources) {
+  waitFor: function (...sources) {
     if (!sources.length) {
       throw new ReferenceError('Dispatch tokens not provided');
     }
@@ -629,12 +629,10 @@ const StoreMixin = {
 
     this.dispatcher.waitFor(tokens);
   },
-
-  exportAsync(asyncMethods) {
+  exportAsync: function (asyncMethods) {
     this.registerAsync(asyncMethods);
   },
-
-  registerAsync(asyncDef) {
+  registerAsync: function (asyncDef) {
     let loadCounter = 0;
 
     const asyncMethods = isFunction(asyncDef) ? asyncDef(this.alt) : asyncDef;
@@ -692,8 +690,7 @@ const StoreMixin = {
       isLoading: () => loadCounter > 0
     });
   },
-
-  exportPublicMethods(methods) {
+  exportPublicMethods: function (methods) {
     eachObject((methodName, value) => {
       if (!isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function');
@@ -702,19 +699,16 @@ const StoreMixin = {
       this.publicMethods[methodName] = value;
     }, [methods]);
   },
-
-  emitChange() {
+  emitChange: function () {
     this.getInstance().emitChange();
   },
-
-  on(lifecycleEvent, handler) {
+  on: function (lifecycleEvent, handler) {
     if (lifecycleEvent === 'error') this.handlesOwnErrors = true;
     const bus = this.lifecycleEvents[lifecycleEvent] || transmitter_1();
     this.lifecycleEvents[lifecycleEvent] = bus;
     return bus.subscribe(handler.bind(this));
   },
-
-  bindAction(symbol, handler) {
+  bindAction: function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in');
     }
@@ -728,8 +722,7 @@ const StoreMixin = {
     this.actionListeners[key].push(handler.bind(this));
     this.boundListeners.push(key);
   },
-
-  bindActions(actions) {
+  bindActions: function (actions) {
     eachObject((action, symbol) => {
       const matchFirstCharacter = /./;
       const assumedEventHandler = action.replace(matchFirstCharacter, x => {
@@ -747,8 +740,7 @@ const StoreMixin = {
       }
     }, [actions]);
   },
-
-  bindListeners(obj) {
+  bindListeners: function (obj) {
     eachObject((methodName, symbol) => {
       const listener = this[methodName];
 
@@ -772,7 +764,7 @@ function doSetState(store, storeInstance, state) {
     return;
   }
 
-  const { config } = storeInstance.StoreModel;
+  const { config: config } = storeInstance.StoreModel;
 
   const nextState = isFunction(state) ? state(storeInstance.state) : state;
 
@@ -788,9 +780,10 @@ function createPrototype(proto, alt, key, extras) {
     displayName: key,
     alt: alt,
     dispatcher: alt.dispatcher,
-    preventDefault() {
+    preventDefault: function () {
       this.getInstance().preventDefault = true;
     },
+
     boundListeners: [],
     lifecycleEvents: {},
     actionListeners: {},
@@ -801,7 +794,7 @@ function createPrototype(proto, alt, key, extras) {
 
 function createStoreConfig(globalConfig, StoreModel) {
   StoreModel.config = assign({
-    getState(state) {
+    getState: function (state) {
       if (Array.isArray(state)) {
         return state.slice();
       } else if (isMutableObject(state)) {
@@ -810,7 +803,7 @@ function createStoreConfig(globalConfig, StoreModel) {
 
       return state;
     },
-    setState(currentState, nextState) {
+    setState: function (currentState, nextState) {
       if (isMutableObject(nextState)) {
         return assign(currentState, nextState);
       }
@@ -827,10 +820,10 @@ function createStoreFromObject(alt, StoreModel, key) {
   let storeInstance;
 
   const StoreProto = createPrototype({}, alt, key, assign({
-    getInstance() {
+    getInstance: function () {
       return storeInstance;
     },
-    setState(nextState) {
+    setState: function (nextState) {
       doSetState(this, storeInstance, nextState);
     }
   }, StoreModel));
@@ -864,7 +857,7 @@ function createStoreFromObject(alt, StoreModel, key) {
 
 function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   let storeInstance;
-  const { config } = StoreModel;
+  const { config: config } = StoreModel;
 
   // Creating a class here so we don't overload the provided store's
   // prototype with the mixin behaviour and I'm extending from StoreModel
@@ -877,10 +870,10 @@ function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
 
   createPrototype(Store.prototype, alt, key, {
     type: 'AltStore',
-    getInstance() {
+    getInstance: function () {
       return storeInstance;
     },
-    setState(nextState) {
+    setState: function (nextState) {
       doSetState(this, storeInstance, nextState);
     }
   });
@@ -918,7 +911,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
     storeStateToLog = Reflect.getOwnMetadata('alt:meta:storeStateToLog', implementation);
   }
 
-  const data = { id, namespace, name, logAs, storeStateToLog };
+  const data = { id: id, namespace: namespace, name: name, logAs: logAs, storeStateToLog: storeStateToLog };
 
   const dispatch$$1 = payload => alt.dispatch(id, payload, data);
 
@@ -1193,7 +1186,7 @@ class Alt {
     }
     if (typeof context !== 'undefined') {
       context[key] = context[key] || [];
-      context[key].push({ name, alt });
+      context[key].push({ name: name, alt: alt });
     }
     return alt;
   }
