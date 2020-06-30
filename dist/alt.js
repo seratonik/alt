@@ -973,9 +973,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var state = store.state;
 	        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
 	        if (fn.isMutableObject(state)) {
-	          fn.eachObject(function (k) {
-	            return delete state[k];
-	          }, [state]);
 	          fn.assign(state, obj[key]);
 	        } else {
 	          store.state = obj[key];

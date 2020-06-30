@@ -9,7 +9,8 @@ export function setAppState(instance, data, onStore) {
       const state = store.state
       if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value
       if (fn.isMutableObject(state)) {
-        fn.eachObject(k => delete state[k], [state])
+        // If we are assigning the new values "merging" with the old ones, why would we delete everything first?
+        //fn.eachObject(k => delete state[k], [state])
         fn.assign(state, obj[key])
       } else {
         store.state = obj[key]
