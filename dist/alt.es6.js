@@ -297,7 +297,9 @@ module.exports = Dispatcher;
 
 var Dispatcher = Dispatcher_1;
 
-const isFunction = x => typeof x === 'function';
+const isFunction = function (x) {
+  return typeof x === 'function';
+};
 
 function isMutableObject(target) {
   const Ctor = target.constructor;
@@ -306,21 +308,23 @@ function isMutableObject(target) {
 }
 
 function eachObject(f, o) {
-  o.forEach(from => {
-    Object.keys(Object(from)).forEach(key => {
+  o.forEach(function (from) {
+    Object.keys(Object(from)).forEach(function (key) {
       f(key, from[key]);
     });
   });
 }
 
 function assign(target, ...source) {
-  eachObject((key, value) => target[key] = value, source);
+  eachObject(function (key, value) {
+    return target[key] = value;
+  }, source);
   return target;
 }
 
 function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data);
-  eachObject((key, value) => {
+  eachObject(function (key, value) {
     const store = instance.stores[key];
     if (store) {
       const { config: config } = store.StoreModel;
@@ -328,7 +332,7 @@ function setAppState(instance, data, onStore) {
       if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
       if (isMutableObject(state)) {
         // If we are assigning the new values "merging" with the old ones, why would we delete everything first?
-        //fn.eachObject(k => delete state[k], [state])
+        // fn.eachObject(k => delete state[k], [state])
         assign(state, obj[key]);
       } else {
         store.state = obj[key];
@@ -340,7 +344,7 @@ function setAppState(instance, data, onStore) {
 
 function snapshot(instance, storeNames = []) {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores);
-  return stores.reduce((obj, storeHandle) => {
+  return stores.reduce(function (obj, storeHandle) {
     const storeName = storeHandle.displayName || storeHandle;
     const store = instance.stores[storeName];
     const { config: config } = store.StoreModel;
@@ -358,7 +362,7 @@ function saveInitialSnapshot(instance, key) {
 }
 
 function filterSnapshots(instance, state, stores) {
-  return stores.reduce((obj, store) => {
+  return stores.reduce(function (obj, store) {
     const storeName = store.displayName || store;
     if (!state[storeName]) {
       throw new ReferenceError(`${storeName} is not a valid store`);
@@ -378,7 +382,7 @@ const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
 function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns;
   const obj = isProto && typeof Obj === 'function' ? Obj.prototype : Obj;
-  return Object.getOwnPropertyNames(obj).reduce((value, m) => {
+  return Object.getOwnPropertyNames(obj).reduce(function (value, m) {
     if (excluded.indexOf(m) !== -1) {
       return value;
     }
@@ -411,7 +415,7 @@ function uid(container, name) {
 }
 
 function formatAsConstant(name) {
-  return name.replace(/[a-z]([A-Z])/g, i => {
+  return name.replace(/[a-z]([A-Z])/g, function (i) {
     return `${i[0]}_${i[1].toLowerCase()}`;
   }).toUpperCase();
 }
@@ -445,7 +449,9 @@ function dispatch(id, actionObj, payload, alt) {
   const name = type;
   const details = { id: type, namespace: namespace, name: name };
 
-  const dispatchLater = x => alt.dispatch(type, x, details);
+  const dispatchLater = function (x) {
+    return alt.dispatch(type, x, details);
+  };
 
   if (isFunction(data)) return data(dispatchLater, alt);
 
@@ -509,9 +515,11 @@ var transmitter_1 = transmitter;
 
 class AltStore {
   constructor(alt, model, state, StoreModel) {
+    var _this = this;
+
     const lifecycleEvents = model.lifecycleEvents;
     this.transmitter = transmitter_1();
-    this.lifecycle = (event, x) => {
+    this.lifecycle = function (event, x) {
       if (lifecycleEvents[event]) lifecycleEvents[event].publish(x);
     };
     this.state = state;
@@ -521,22 +529,28 @@ class AltStore {
     this.displayName = model.displayName;
     this.boundListeners = model.boundListeners;
     this.StoreModel = StoreModel;
-    this.reduce = model.reduce || (x => x);
+    this.reduce = model.reduce || function (x) {
+      return x;
+    };
     this.subscriptions = [];
 
-    const output = model.output || (x => x);
+    const output = model.output || function (x) {
+      return x;
+    };
 
-    this.emitChange = () => this.transmitter.publish(output(this.state));
+    this.emitChange = function () {
+      return _this.transmitter.publish(output(_this.state));
+    };
 
-    const handleDispatch = (f, payload) => {
+    const handleDispatch = function (f, payload) {
       try {
         return f();
       } catch (e) {
         if (model.handlesOwnErrors) {
-          this.lifecycle('error', {
+          _this.lifecycle('error', {
             error: e,
             payload: payload,
-            state: this.state
+            state: _this.state
           });
           return false;
         }
@@ -548,12 +562,12 @@ class AltStore {
     assign(this, model.publicMethods);
 
     // Register dispatcher
-    this.dispatchToken = alt.dispatcher.register(payload => {
-      this.preventDefault = false;
+    this.dispatchToken = alt.dispatcher.register(function (payload) {
+      _this.preventDefault = false;
 
-      this.lifecycle('beforeEach', {
+      _this.lifecycle('beforeEach', {
         payload: payload,
-        state: this.state
+        state: _this.state
       });
 
       const actionHandlers = model.actionListeners[payload.action];
@@ -562,31 +576,31 @@ class AltStore {
         let result;
 
         if (actionHandlers) {
-          result = handleDispatch(() => {
-            return actionHandlers.filter(Boolean).every(handler => {
+          result = handleDispatch(function () {
+            return actionHandlers.filter(Boolean).every(function (handler) {
               return handler.call(model, payload.data, payload.action) !== false;
             });
           }, payload);
         } else {
-          result = handleDispatch(() => {
+          result = handleDispatch(function () {
             return model.otherwise(payload.data, payload.action);
           }, payload);
         }
 
-        if (result !== false && !this.preventDefault) this.emitChange();
+        if (result !== false && !_this.preventDefault) _this.emitChange();
       }
 
       if (model.reduce) {
-        handleDispatch(() => {
-          const value = model.reduce(this.state, payload);
-          if (value !== undefined) this.state = value;
+        handleDispatch(function () {
+          const value = model.reduce(_this.state, payload);
+          if (value !== undefined) _this.state = value;
         }, payload);
-        if (!this.preventDefault) this.emitChange();
+        if (!_this.preventDefault) _this.emitChange();
       }
 
-      this.lifecycle('afterEach', {
+      _this.lifecycle('afterEach', {
         payload: payload,
-        state: this.state
+        state: _this.state
       });
     });
 
@@ -594,18 +608,24 @@ class AltStore {
   }
 
   listen(cb) {
+    var _this2 = this;
+
     if (!isFunction(cb)) throw new TypeError('listen expects a function');
     const { dispose: dispose } = this.transmitter.subscribe(cb);
     this.subscriptions.push({ cb: cb, dispose: dispose });
-    return () => {
-      this.lifecycle('unlisten');
+    return function () {
+      _this2.lifecycle('unlisten');
       dispose();
     };
   }
 
   unlisten(cb) {
     this.lifecycle('unlisten');
-    this.subscriptions.filter(subscription => subscription.cb === cb).forEach(subscription => subscription.dispose());
+    this.subscriptions.filter(function (subscription) {
+      return subscription.cb === cb;
+    }).forEach(function (subscription) {
+      return subscription.dispose();
+    });
   }
 
   getState() {
@@ -624,7 +644,7 @@ const StoreMixin = {
       sourcesArray = Array.isArray(sources[0]) ? sources[0] : sources;
     }
 
-    const tokens = sourcesArray.map(source => {
+    const tokens = sourcesArray.map(function (source) {
       return source.dispatchToken || source;
     });
 
@@ -634,39 +654,45 @@ const StoreMixin = {
     this.registerAsync(asyncMethods);
   },
   registerAsync: function (asyncDef) {
+    var _this = this;
+
     let loadCounter = 0;
 
     const asyncMethods = isFunction(asyncDef) ? asyncDef(this.alt) : asyncDef;
 
-    const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
+    const toExport = Object.keys(asyncMethods).reduce(function (publicMethods, methodName) {
       const desc = asyncMethods[methodName];
-      const spec = isFunction(desc) ? desc(this) : desc;
+      const spec = isFunction(desc) ? desc(_this) : desc;
 
       const validHandlers = ['success', 'error', 'loading'];
-      validHandlers.forEach(handler => {
+      validHandlers.forEach(function (handler) {
         if (spec[handler] && !spec[handler].id) {
           throw new Error(`${handler} handler must be an action function`);
         }
       });
 
-      publicMethods[methodName] = (...args) => {
-        const state = this.getInstance().getState();
+      publicMethods[methodName] = function (...args) {
+        const state = _this.getInstance().getState();
         const value = spec.local && spec.local(state, ...args);
         const shouldFetch = spec.shouldFetch ? spec.shouldFetch(state, ...args)
         /*eslint-disable*/
         : value == null;
         /*eslint-enable*/
-        const intercept = spec.interceptResponse || (x => x);
+        const intercept = spec.interceptResponse || function (x) {
+          return x;
+        };
 
-        const makeActionHandler = (action, isError) => {
-          return x => {
-            const fire = () => {
+        const makeActionHandler = function (action, isError) {
+          return function (x) {
+            const fire = function () {
               loadCounter -= 1;
               action(intercept(x, action, args));
               if (isError) throw x;
               return x;
             };
-            return this.alt.trapAsync ? () => fire() : fire();
+            return _this.alt.trapAsync ? function () {
+              return fire();
+            } : fire();
           };
         };
 
@@ -679,7 +705,7 @@ const StoreMixin = {
         }
 
         // otherwise emit the change now
-        this.emitChange();
+        _this.emitChange();
         return value;
       };
 
@@ -688,16 +714,20 @@ const StoreMixin = {
 
     this.exportPublicMethods(toExport);
     this.exportPublicMethods({
-      isLoading: () => loadCounter > 0
+      isLoading: function () {
+        return loadCounter > 0;
+      }
     });
   },
   exportPublicMethods: function (methods) {
-    eachObject((methodName, value) => {
+    var _this2 = this;
+
+    eachObject(function (methodName, value) {
       if (!isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function');
       }
 
-      this.publicMethods[methodName] = value;
+      _this2.publicMethods[methodName] = value;
     }, [methods]);
   },
   emitChange: function () {
@@ -724,37 +754,41 @@ const StoreMixin = {
     this.boundListeners.push(key);
   },
   bindActions: function (actions) {
-    eachObject((action, symbol) => {
+    var _this3 = this;
+
+    eachObject(function (action, symbol) {
       const matchFirstCharacter = /./;
-      const assumedEventHandler = action.replace(matchFirstCharacter, x => {
+      const assumedEventHandler = action.replace(matchFirstCharacter, function (x) {
         return `on${x[0].toUpperCase()}`;
       });
 
-      if (this[action] && this[assumedEventHandler]) {
+      if (_this3[action] && _this3[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError(`You have multiple action handlers bound to an action: ` + `${action} and ${assumedEventHandler}`);
       }
 
-      const handler = this[action] || this[assumedEventHandler];
+      const handler = _this3[action] || _this3[assumedEventHandler];
       if (handler) {
-        this.bindAction(symbol, handler);
+        _this3.bindAction(symbol, handler);
       }
     }, [actions]);
   },
   bindListeners: function (obj) {
-    eachObject((methodName, symbol) => {
-      const listener = this[methodName];
+    var _this4 = this;
+
+    eachObject(function (methodName, symbol) {
+      const listener = _this4[methodName];
 
       if (!listener) {
-        throw new ReferenceError(`${methodName} defined but does not exist in ${this.displayName}`);
+        throw new ReferenceError(`${methodName} defined but does not exist in ${_this4.displayName}`);
       }
 
       if (Array.isArray(symbol)) {
-        symbol.forEach(action => {
-          this.bindAction(action, listener);
+        symbol.forEach(function (action) {
+          _this4.bindAction(action, listener);
         });
       } else {
-        this.bindAction(symbol, listener);
+        _this4.bindAction(symbol, listener);
       }
     }, [obj]);
   }
@@ -814,7 +848,9 @@ function createStoreConfig(globalConfig, StoreModel) {
 }
 
 function transformStore(transforms, StoreModel) {
-  return transforms.reduce((Store, transform) => transform(Store), StoreModel);
+  return transforms.reduce(function (Store, transform) {
+    return transform(Store);
+  }, StoreModel);
 }
 
 function createStoreFromObject(alt, StoreModel, key) {
@@ -842,7 +878,7 @@ function createStoreFromObject(alt, StoreModel, key) {
   // bind the lifecycle events
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
-    eachObject((eventName, event) => {
+    eachObject(function (eventName, event) {
       StoreMixin.on.call(StoreProto, eventName, event);
     }, [StoreProto.lifecycle]);
   }
@@ -914,10 +950,12 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
   const data = { id: id, namespace: namespace, name: name, logAs: logAs, storeStateToLog: storeStateToLog };
 
-  const dispatch$$1 = payload => alt.dispatch(id, payload, data);
+  const dispatch$$1 = function (payload) {
+    return alt.dispatch(id, payload, data);
+  };
 
   // the action itself
-  const action = (...args) => {
+  const action = function (...args) {
     let inject;
     // check for action's implementation metadata if dispatch should be injected
     // for example when decorated via @Reflect.metadata
@@ -962,7 +1000,11 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
     return actionResult;
   };
-  action.defer = (...args) => setTimeout(() => action.apply(null, args));
+  action.defer = function (...args) {
+    return setTimeout(function () {
+      return action.apply(null, args);
+    });
+  };
   action.id = id;
   action.data = data;
   action.dispatch = dispatch$$1;
@@ -986,7 +1028,9 @@ class Alt {
     this.serialize = config.serialize || JSON.stringify;
     this.deserialize = config.deserialize || JSON.parse;
     this.dispatcher = config.dispatcher || new Dispatcher();
-    this.batchingFunction = config.batchingFunction || (callback => callback());
+    this.batchingFunction = config.batchingFunction || function (callback) {
+      return callback();
+    };
     this.actions = { global: {} };
     this.stores = {};
     this.storeTransforms = config.storeTransforms || [];
@@ -997,7 +1041,9 @@ class Alt {
   }
 
   dispatch(action, data, details) {
-    this.batchingFunction(() => {
+    var _this = this;
+
+    this.batchingFunction(function () {
       const id = Math.random().toString(18).substr(2, 16);
 
       // support straight dispatching of FSA-style actions
@@ -1007,14 +1053,14 @@ class Alt {
           namespace: action.type,
           name: action.type
         };
-        return this.dispatcher.dispatch(fsa(id, action.type, action.payload, fsaDetails));
+        return _this.dispatcher.dispatch(fsa(id, action.type, action.payload, fsaDetails));
       }
 
       if (action.id && action.dispatch) {
-        return dispatch(id, action, data, this);
+        return dispatch(id, action, data, _this);
       }
 
-      return this.dispatcher.dispatch(fsa(id, action, data, details));
+      return _this.dispatcher.dispatch(fsa(id, action, data, details));
     });
   }
 
@@ -1054,7 +1100,7 @@ class Alt {
 
   generateActions(...actionNames) {
     const actions = { name: 'global' };
-    return this.createActions(actionNames.reduce((obj, action) => {
+    return this.createActions(actionNames.reduce(function (obj, action) {
       obj[action] = dispatchIdentity;
       return obj;
     }, actions));
@@ -1065,6 +1111,8 @@ class Alt {
   }
 
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
+    var _this2 = this;
+
     const actions = {};
     const key = uid(this._actionsRegistry, ActionsClass.displayName || ActionsClass.name || 'Unknown');
 
@@ -1076,7 +1124,7 @@ class Alt {
         }
 
         generateActions(...actionNames) {
-          actionNames.forEach(actionName => {
+          actionNames.forEach(function (actionName) {
             actions[actionName] = dispatchIdentity;
           });
         }
@@ -1089,7 +1137,7 @@ class Alt {
 
     this.actions[key] = this.actions[key] || {};
 
-    eachObject((actionName, action) => {
+    eachObject(function (actionName, action) {
       if (!isFunction(action)) {
         exportObj[actionName] = action;
         return;
@@ -1107,7 +1155,7 @@ class Alt {
       }
 
       // create the action
-      exportObj[actionName] = makeAction(this, key, actionName, action, exportObj);
+      exportObj[actionName] = makeAction(_this2, key, actionName, action, exportObj);
 
       // generate a constant
       const constant = formatAsConstant(actionName);
@@ -1124,7 +1172,7 @@ class Alt {
   }
 
   rollback() {
-    setAppState(this, this.serialize(this._lastSnapshot), storeInst => {
+    setAppState(this, this.serialize(this._lastSnapshot), function (storeInst) {
       storeInst.lifecycle('rollback');
       storeInst.emitChange();
     });
@@ -1133,7 +1181,7 @@ class Alt {
   recycle(...storeNames) {
     const initialSnapshot = storeNames.length ? filterSnapshots(this, this._initSnapshot, storeNames) : this._initSnapshot;
 
-    setAppState(this, this.serialize(initialSnapshot), storeInst => {
+    setAppState(this, this.serialize(initialSnapshot), function (storeInst) {
       storeInst.lifecycle('init');
       storeInst.emitChange();
     });
@@ -1146,7 +1194,7 @@ class Alt {
   }
 
   bootstrap(data) {
-    setAppState(this, data, (storeInst, state) => {
+    setAppState(this, data, function (storeInst, state) {
       storeInst.lifecycle('bootstrap', state);
       storeInst.emitChange();
     });

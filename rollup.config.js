@@ -20,6 +20,7 @@ let Config = {
             plugins:[
                 'transform-class-properties',
                 'transform-object-rest-spread',
+                'transform-es2015-arrow-functions',
                 'transform-es2015-shorthand-properties'
             ]
         })
