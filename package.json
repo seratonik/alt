@@ -1,6 +1,6 @@
 {
   "name": "odgn-alt",
-  "version": "0.18.6-sera.8",
+  "version": "0.18.6-sera.9",
   "description": "A flux implementation",
   "main": "dist/alt.es6",
   "module": "dist/alt.es6",
@@ -26,6 +26,7 @@
     "babel-plugin-transform-es2015-parameters": "^6.24.1",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.22.0",
     "babel-plugin-transform-es2015-spread": "^6.22.0",
+    "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-airbnb": "",
     "babel-preset-stage-0": "^6",
@@ -102,6 +103,5 @@
     "react",
     "unidirectional"
   ],
-  "config": {
-  }
+  "config": {}
 }

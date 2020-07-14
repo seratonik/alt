@@ -373,7 +373,7 @@ function filterSnapshots(instance, state, stores) {
   return stores.reduce(function (obj, store) {
     const storeName = store.displayName || store;
     if (!state[storeName]) {
-      throw new ReferenceError(`${storeName} is not a valid store`);
+      throw new ReferenceError(storeName + ' is not a valid store');
     }
     obj[storeName] = state[storeName];
     return obj;
@@ -426,7 +426,7 @@ function uid(container, name) {
 
 function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
-    return `${i[0]}_${i[1].toLowerCase()}`;
+    return i[0] + '_' + i[1].toLowerCase();
   }).toUpperCase();
 }
 
@@ -690,7 +690,7 @@ const StoreMixin = {
       const validHandlers = ['success', 'error', 'loading'];
       validHandlers.forEach(function (handler) {
         if (spec[handler] && !spec[handler].id) {
-          throw new Error(`${handler} handler must be an action function`);
+          throw new Error(handler + ' handler must be an action function');
         }
       });
 
@@ -786,12 +786,12 @@ const StoreMixin = {
     eachObject(function (action, symbol) {
       const matchFirstCharacter = /./;
       const assumedEventHandler = action.replace(matchFirstCharacter, function (x) {
-        return `on${x[0].toUpperCase()}`;
+        return 'on' + x[0].toUpperCase();
       });
 
       if (_this3[action] && _this3[assumedEventHandler]) {
         // If you have both action and onAction
-        throw new ReferenceError(`You have multiple action handlers bound to an action: ` + `${action} and ${assumedEventHandler}`);
+        throw new ReferenceError('You have multiple action handlers bound to an action: ' + (action + ' and ' + assumedEventHandler));
       }
 
       const handler = _this3[action] || _this3[assumedEventHandler];
@@ -807,7 +807,7 @@ const StoreMixin = {
       const listener = _this4[methodName];
 
       if (!listener) {
-        throw new ReferenceError(`${methodName} defined but does not exist in ${_this4.displayName}`);
+        throw new ReferenceError(methodName + ' defined but does not exist in ' + _this4.displayName);
       }
 
       if (Array.isArray(symbol)) {
@@ -974,7 +974,7 @@ function isPromise(obj) {
 }
 
 function makeAction(alt, namespace, name, implementation, obj) {
-  const id = uid(alt._actionsRegistry, `${namespace}.${name}`);
+  const id = uid(alt._actionsRegistry, namespace + '.' + name);
   alt._actionsRegistry[id] = 1;
 
   let logAs;
@@ -1136,7 +1136,7 @@ class Alt {
 
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
-        warn(`A store named ${key} already exists, double check your store ` + `names or pass in your own custom identifier for each store`);
+        warn('A store named ' + key + ' already exists, double check your store ' + 'names or pass in your own custom identifier for each store');
       } else {
         warn('Store name was not specified');
       }
