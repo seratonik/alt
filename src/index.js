@@ -110,8 +110,8 @@ class Alt {
     if (fn.isFunction(ActionsClass)) {
       fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
-        constructor(...args) {
-          super(...args)
+        constructor(a1,a2,a3,a4,a5,a6,a7,a8) {
+          super(a1,a2,a3,a4,a5,a6,a7,a8)
         }
 
         generateActions(...actionNames) {

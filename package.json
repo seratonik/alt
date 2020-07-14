@@ -1,6 +1,6 @@
 {
   "name": "odgn-alt",
-  "version": "0.18.6-sera.7",
+  "version": "0.18.6-sera.8",
   "description": "A flux implementation",
   "main": "dist/alt.es6",
   "module": "dist/alt.es6",

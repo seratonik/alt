@@ -127,8 +127,8 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   // prototype with the mixin behaviour and I'm extending from StoreModel
   // so we can inherit any extensions from the provided store.
   class Store extends StoreModel {
-    constructor(...args) {
-      super(...args)
+    constructor(a1,a2,a3,a4,a5,a6,a7,a8) {
+      super(a1,a2,a3,a4,a5,a6,a7,a8)
     }
   }
 
