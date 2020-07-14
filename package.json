@@ -1,8 +1,9 @@
 {
   "name": "odgn-alt",
-  "version": "0.18.6-sera.6",
+  "version": "0.18.6-sera.7",
   "description": "A flux implementation",
   "main": "dist/alt.es6",
+  "module": "dist/alt.es6",
   "jsnext:main": "dist/alt.es6",
   "dependencies": {
     "flux": "2.1.1",

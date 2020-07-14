@@ -528,15 +528,9 @@ function transmitter() {
 
 var transmitter_1 = transmitter;
 
-var _createClass$1 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-let AltStore = function () {
-  function AltStore(alt, model, state, StoreModel) {
+class AltStore {
+  constructor(alt, model, state, StoreModel) {
     var _this = this;
-
-    _classCallCheck$2(this, AltStore);
 
     const lifecycleEvents = model.lifecycleEvents;
     this.transmitter = transmitter_1();
@@ -628,42 +622,35 @@ let AltStore = function () {
     this.lifecycle('init');
   }
 
-  _createClass$1(AltStore, [{
-    key: 'listen',
-    value: function listen(cb) {
-      var _this2 = this;
+  listen(cb) {
+    var _this2 = this;
 
-      if (!isFunction(cb)) throw new TypeError('listen expects a function');
+    if (!isFunction(cb)) throw new TypeError('listen expects a function');
 
-      var _transmitter$subscrib = this.transmitter.subscribe(cb);
+    var _transmitter$subscrib = this.transmitter.subscribe(cb);
 
-      const dispose = _transmitter$subscrib.dispose;
+    const dispose = _transmitter$subscrib.dispose;
 
-      this.subscriptions.push({ cb: cb, dispose: dispose });
-      return function () {
-        _this2.lifecycle('unlisten');
-        dispose();
-      };
-    }
-  }, {
-    key: 'unlisten',
-    value: function unlisten(cb) {
-      this.lifecycle('unlisten');
-      this.subscriptions.filter(function (subscription) {
-        return subscription.cb === cb;
-      }).forEach(function (subscription) {
-        return subscription.dispose();
-      });
-    }
-  }, {
-    key: 'getState',
-    value: function getState() {
-      return this.StoreModel.config.getState.call(this, this.state);
-    }
-  }]);
+    this.subscriptions.push({ cb: cb, dispose: dispose });
+    return function () {
+      _this2.lifecycle('unlisten');
+      dispose();
+    };
+  }
 
-  return AltStore;
-}();
+  unlisten(cb) {
+    this.lifecycle('unlisten');
+    this.subscriptions.filter(function (subscription) {
+      return subscription.cb === cb;
+    }).forEach(function (subscription) {
+      return subscription.dispose();
+    });
+  }
+
+  getState() {
+    return this.StoreModel.config.getState.call(this, this.state);
+  }
+}
 
 const StoreMixin = {
   waitFor: function () {
@@ -834,12 +821,6 @@ const StoreMixin = {
   }
 };
 
-function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 function doSetState(store, storeInstance, state) {
   if (!state) {
     return;
@@ -947,23 +928,11 @@ function createStoreFromClass(alt, StoreModel, key) {
   // prototype with the mixin behaviour and I'm extending from StoreModel
   // so we can inherit any extensions from the provided store.
 
-  let Store = function (_StoreModel) {
-    _inherits$1(Store, _StoreModel);
-
-    function Store() {
-      var _ref;
-
-      _classCallCheck$1(this, Store);
-
-      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      return _possibleConstructorReturn$1(this, (_ref = Store.__proto__ || Object.getPrototypeOf(Store)).call.apply(_ref, [this].concat(args)));
+  class Store extends StoreModel {
+    constructor() {
+      super(...arguments);
     }
-
-    return Store;
-  }(StoreModel);
+  }
 
   createPrototype(Store.prototype, alt, key, {
     type: 'AltStore',
@@ -1100,20 +1069,10 @@ function makeAction(alt, namespace, name, implementation, obj) {
   return action;
 }
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 /* global window */
-let Alt = function () {
-  function Alt() {
+class Alt {
+  constructor() {
     let config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Alt);
 
     this.config = config;
     this.serialize = config.serialize || JSON.stringify;
@@ -1131,283 +1090,245 @@ let Alt = function () {
     this._lastSnapshot = {};
   }
 
-  _createClass(Alt, [{
-    key: 'dispatch',
-    value: function dispatch$$1(action, data, details) {
-      var _this = this;
+  dispatch(action, data, details) {
+    var _this = this;
 
-      this.batchingFunction(function () {
-        const id = Math.random().toString(18).substr(2, 16);
+    this.batchingFunction(function () {
+      const id = Math.random().toString(18).substr(2, 16);
 
-        // support straight dispatching of FSA-style actions
-        if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
-          const fsaDetails = {
-            id: action.type,
-            namespace: action.type,
-            name: action.type
-          };
-          return _this.dispatcher.dispatch(fsa(id, action.type, action.payload, fsaDetails));
+      // support straight dispatching of FSA-style actions
+      if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
+        const fsaDetails = {
+          id: action.type,
+          namespace: action.type,
+          name: action.type
+        };
+        return _this.dispatcher.dispatch(fsa(id, action.type, action.payload, fsaDetails));
+      }
+
+      if (action.id && action.dispatch) {
+        return dispatch(id, action, data, _this);
+      }
+
+      return _this.dispatcher.dispatch(fsa(id, action, data, details));
+    });
+  }
+
+  createUnsavedStore(StoreModel) {
+    const key = StoreModel.displayName || '';
+    createStoreConfig(this.config, StoreModel);
+    const Store = transformStore(this.storeTransforms, StoreModel);
+
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    return isFunction(Store) ? createStoreFromClass.apply(store, [this, Store, key].concat(args)) : createStoreFromObject(this, Store, key);
+  }
+
+  createStore(StoreModel, iden) {
+    let key = iden || StoreModel.displayName || StoreModel.name || '';
+    createStoreConfig(this.config, StoreModel);
+    const Store = transformStore(this.storeTransforms, StoreModel);
+
+    /* istanbul ignore next */
+    if (module.hot) delete this.stores[key];
+
+    if (this.stores[key] || !key) {
+      if (this.stores[key]) {
+        warn(`A store named ${key} already exists, double check your store ` + `names or pass in your own custom identifier for each store`);
+      } else {
+        warn('Store name was not specified');
+      }
+
+      key = uid(this.stores, key);
+    }
+
+    for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+      args[_key2 - 2] = arguments[_key2];
+    }
+
+    const storeInstance = isFunction(Store) ? createStoreFromClass.apply(store, [this, Store, key].concat(args)) : createStoreFromObject(this, Store, key);
+
+    this.stores[key] = storeInstance;
+    saveInitialSnapshot(this, key);
+
+    return storeInstance;
+  }
+
+  generateActions() {
+    const actions = { name: 'global' };
+
+    for (var _len3 = arguments.length, actionNames = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      actionNames[_key3] = arguments[_key3];
+    }
+
+    return this.createActions(actionNames.reduce(function (obj, action) {
+      obj[action] = dispatchIdentity;
+      return obj;
+    }, actions));
+  }
+
+  createAction(name, implementation, obj) {
+    return makeAction(this, 'global', name, implementation, obj);
+  }
+
+  createActions(ActionsClass) {
+    var _this2 = this;
+
+    let exportObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    const actions = {};
+    const key = uid(this._actionsRegistry, ActionsClass.displayName || ActionsClass.name || 'Unknown');
+
+    if (isFunction(ActionsClass)) {
+      assign(actions, getPrototypeChain(ActionsClass));
+      class ActionsGenerator extends ActionsClass {
+        constructor() {
+          super(...arguments);
         }
 
-        if (action.id && action.dispatch) {
-          return dispatch(id, action, data, _this);
-        }
-
-        return _this.dispatcher.dispatch(fsa(id, action, data, details));
-      });
-    }
-  }, {
-    key: 'createUnsavedStore',
-    value: function createUnsavedStore(StoreModel) {
-      const key = StoreModel.displayName || '';
-      createStoreConfig(this.config, StoreModel);
-      const Store = transformStore(this.storeTransforms, StoreModel);
-
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-
-      return isFunction(Store) ? createStoreFromClass.apply(store, [this, Store, key].concat(args)) : createStoreFromObject(this, Store, key);
-    }
-  }, {
-    key: 'createStore',
-    value: function createStore(StoreModel, iden) {
-      let key = iden || StoreModel.displayName || StoreModel.name || '';
-      createStoreConfig(this.config, StoreModel);
-      const Store = transformStore(this.storeTransforms, StoreModel);
-
-      /* istanbul ignore next */
-      if (module.hot) delete this.stores[key];
-
-      if (this.stores[key] || !key) {
-        if (this.stores[key]) {
-          warn(`A store named ${key} already exists, double check your store ` + `names or pass in your own custom identifier for each store`);
-        } else {
-          warn('Store name was not specified');
-        }
-
-        key = uid(this.stores, key);
-      }
-
-      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        args[_key2 - 2] = arguments[_key2];
-      }
-
-      const storeInstance = isFunction(Store) ? createStoreFromClass.apply(store, [this, Store, key].concat(args)) : createStoreFromObject(this, Store, key);
-
-      this.stores[key] = storeInstance;
-      saveInitialSnapshot(this, key);
-
-      return storeInstance;
-    }
-  }, {
-    key: 'generateActions',
-    value: function generateActions() {
-      const actions = { name: 'global' };
-
-      for (var _len3 = arguments.length, actionNames = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        actionNames[_key3] = arguments[_key3];
-      }
-
-      return this.createActions(actionNames.reduce(function (obj, action) {
-        obj[action] = dispatchIdentity;
-        return obj;
-      }, actions));
-    }
-  }, {
-    key: 'createAction',
-    value: function createAction(name, implementation, obj) {
-      return makeAction(this, 'global', name, implementation, obj);
-    }
-  }, {
-    key: 'createActions',
-    value: function createActions(ActionsClass) {
-      var _this3 = this;
-
-      let exportObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      const actions = {};
-      const key = uid(this._actionsRegistry, ActionsClass.displayName || ActionsClass.name || 'Unknown');
-
-      if (isFunction(ActionsClass)) {
-        assign(actions, getPrototypeChain(ActionsClass));
-
-        let ActionsGenerator = function (_ActionsClass) {
-          _inherits(ActionsGenerator, _ActionsClass);
-
-          function ActionsGenerator() {
-            var _ref;
-
-            _classCallCheck(this, ActionsGenerator);
-
-            for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-              args[_key5] = arguments[_key5];
-            }
-
-            return _possibleConstructorReturn(this, (_ref = ActionsGenerator.__proto__ || Object.getPrototypeOf(ActionsGenerator)).call.apply(_ref, [this].concat(args)));
+        generateActions() {
+          for (var _len5 = arguments.length, actionNames = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+            actionNames[_key5] = arguments[_key5];
           }
 
-          _createClass(ActionsGenerator, [{
-            key: 'generateActions',
-            value: function generateActions() {
-              for (var _len6 = arguments.length, actionNames = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-                actionNames[_key6] = arguments[_key6];
-              }
-
-              actionNames.forEach(function (actionName) {
-                actions[actionName] = dispatchIdentity;
-              });
-            }
-          }]);
-
-          return ActionsGenerator;
-        }(ActionsClass);
-
-        for (var _len4 = arguments.length, argsForConstructor = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
-          argsForConstructor[_key4 - 2] = arguments[_key4];
+          actionNames.forEach(function (actionName) {
+            actions[actionName] = dispatchIdentity;
+          });
         }
-
-        assign(actions, new (Function.prototype.bind.apply(ActionsGenerator, [null].concat(argsForConstructor)))());
-      } else {
-        assign(actions, ActionsClass);
       }
 
-      this.actions[key] = this.actions[key] || {};
+      for (var _len4 = arguments.length, argsForConstructor = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+        argsForConstructor[_key4 - 2] = arguments[_key4];
+      }
 
-      eachObject(function (actionName, action) {
-        if (!isFunction(action)) {
+      assign(actions, new (Function.prototype.bind.apply(ActionsGenerator, [null].concat(argsForConstructor)))());
+    } else {
+      assign(actions, ActionsClass);
+    }
+
+    this.actions[key] = this.actions[key] || {};
+
+    eachObject(function (actionName, action) {
+      if (!isFunction(action)) {
+        exportObj[actionName] = action;
+        return;
+      }
+
+      // Don't make an action out of method/function with
+      // "alt:skipMakeAction" metadata (via @Reflect.metadata decorator)
+      if (typeof Reflect === 'object' && isFunction(Reflect.getOwnMetadata)) {
+        const skip = Reflect.getOwnMetadata('alt:skipMakeAction', action);
+
+        if (skip === true) {
           exportObj[actionName] = action;
           return;
         }
-
-        // Don't make an action out of method/function with
-        // "alt:skipMakeAction" metadata (via @Reflect.metadata decorator)
-        if (typeof Reflect === 'object' && isFunction(Reflect.getOwnMetadata)) {
-          const skip = Reflect.getOwnMetadata('alt:skipMakeAction', action);
-
-          if (skip === true) {
-            exportObj[actionName] = action;
-            return;
-          }
-        }
-
-        // create the action
-        exportObj[actionName] = makeAction(_this3, key, actionName, action, exportObj);
-
-        // generate a constant
-        const constant = formatAsConstant(actionName);
-        exportObj[constant] = exportObj[actionName].id;
-      }, [actions]);
-
-      return exportObj;
-    }
-  }, {
-    key: 'takeSnapshot',
-    value: function takeSnapshot() {
-      for (var _len7 = arguments.length, storeNames = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-        storeNames[_key7] = arguments[_key7];
       }
 
-      const state = snapshot(this, storeNames);
-      assign(this._lastSnapshot, state);
-      return this.serialize(state);
-    }
-  }, {
-    key: 'rollback',
-    value: function rollback() {
-      setAppState(this, this.serialize(this._lastSnapshot), function (storeInst) {
-        storeInst.lifecycle('rollback');
-        storeInst.emitChange();
-      });
-    }
-  }, {
-    key: 'recycle',
-    value: function recycle() {
-      for (var _len8 = arguments.length, storeNames = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-        storeNames[_key8] = arguments[_key8];
-      }
+      // create the action
+      exportObj[actionName] = makeAction(_this2, key, actionName, action, exportObj);
 
-      const initialSnapshot = storeNames.length ? filterSnapshots(this, this._initSnapshot, storeNames) : this._initSnapshot;
+      // generate a constant
+      const constant = formatAsConstant(actionName);
+      exportObj[constant] = exportObj[actionName].id;
+    }, [actions]);
 
-      setAppState(this, this.serialize(initialSnapshot), function (storeInst) {
-        storeInst.lifecycle('init');
-        storeInst.emitChange();
-      });
-    }
-  }, {
-    key: 'flush',
-    value: function flush() {
-      const state = this.serialize(snapshot(this));
-      this.recycle();
-      return state;
-    }
-  }, {
-    key: 'bootstrap',
-    value: function bootstrap(data) {
-      setAppState(this, data, function (storeInst, state) {
-        storeInst.lifecycle('bootstrap', state);
-        storeInst.emitChange();
-      });
-    }
-  }, {
-    key: 'prepare',
-    value: function prepare(storeInst, payload) {
-      const data = {};
-      if (!storeInst.displayName) {
-        throw new ReferenceError('Store provided does not have a name');
-      }
-      data[storeInst.displayName] = payload;
-      return this.serialize(data);
+    return exportObj;
+  }
+
+  takeSnapshot() {
+    for (var _len6 = arguments.length, storeNames = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+      storeNames[_key6] = arguments[_key6];
     }
 
-    // Instance type methods for injecting alt into your application as context
+    const state = snapshot(this, storeNames);
+    assign(this._lastSnapshot, state);
+    return this.serialize(state);
+  }
 
-  }, {
-    key: 'addActions',
-    value: function addActions(name, ActionsClass) {
-      for (var _len9 = arguments.length, args = Array(_len9 > 2 ? _len9 - 2 : 0), _key9 = 2; _key9 < _len9; _key9++) {
-        args[_key9 - 2] = arguments[_key9];
-      }
+  rollback() {
+    setAppState(this, this.serialize(this._lastSnapshot), function (storeInst) {
+      storeInst.lifecycle('rollback');
+      storeInst.emitChange();
+    });
+  }
 
-      this.actions[name] = Array.isArray(ActionsClass) ? this.generateActions.apply(this, ActionsClass) : this.createActions.apply(this, [ActionsClass].concat(args));
+  recycle() {
+    for (var _len7 = arguments.length, storeNames = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+      storeNames[_key7] = arguments[_key7];
     }
-  }, {
-    key: 'addStore',
-    value: function addStore(name, StoreModel) {
-      for (var _len10 = arguments.length, args = Array(_len10 > 2 ? _len10 - 2 : 0), _key10 = 2; _key10 < _len10; _key10++) {
-        args[_key10 - 2] = arguments[_key10];
-      }
 
-      this.createStore.apply(this, [StoreModel, name].concat(args));
-    }
-  }, {
-    key: 'getActions',
-    value: function getActions(name) {
-      return this.actions[name];
-    }
-  }, {
-    key: 'getStore',
-    value: function getStore(name) {
-      return this.stores[name];
-    }
-  }], [{
-    key: 'debug',
-    value: function debug(name, alt, win) {
-      const key = 'alt.js.org';
-      let context = win;
-      if (!context && typeof window !== 'undefined') {
-        context = window;
-      }
-      if (typeof context !== 'undefined') {
-        context[key] = context[key] || [];
-        context[key].push({ name: name, alt: alt });
-      }
-      return alt;
-    }
-  }]);
+    const initialSnapshot = storeNames.length ? filterSnapshots(this, this._initSnapshot, storeNames) : this._initSnapshot;
 
-  return Alt;
-}();
+    setAppState(this, this.serialize(initialSnapshot), function (storeInst) {
+      storeInst.lifecycle('init');
+      storeInst.emitChange();
+    });
+  }
+
+  flush() {
+    const state = this.serialize(snapshot(this));
+    this.recycle();
+    return state;
+  }
+
+  bootstrap(data) {
+    setAppState(this, data, function (storeInst, state) {
+      storeInst.lifecycle('bootstrap', state);
+      storeInst.emitChange();
+    });
+  }
+
+  prepare(storeInst, payload) {
+    const data = {};
+    if (!storeInst.displayName) {
+      throw new ReferenceError('Store provided does not have a name');
+    }
+    data[storeInst.displayName] = payload;
+    return this.serialize(data);
+  }
+
+  // Instance type methods for injecting alt into your application as context
+
+  addActions(name, ActionsClass) {
+    for (var _len8 = arguments.length, args = Array(_len8 > 2 ? _len8 - 2 : 0), _key8 = 2; _key8 < _len8; _key8++) {
+      args[_key8 - 2] = arguments[_key8];
+    }
+
+    this.actions[name] = Array.isArray(ActionsClass) ? this.generateActions.apply(this, ActionsClass) : this.createActions.apply(this, [ActionsClass].concat(args));
+  }
+
+  addStore(name, StoreModel) {
+    for (var _len9 = arguments.length, args = Array(_len9 > 2 ? _len9 - 2 : 0), _key9 = 2; _key9 < _len9; _key9++) {
+      args[_key9 - 2] = arguments[_key9];
+    }
+
+    this.createStore.apply(this, [StoreModel, name].concat(args));
+  }
+
+  getActions(name) {
+    return this.actions[name];
+  }
+
+  getStore(name) {
+    return this.stores[name];
+  }
+
+  static debug(name, alt, win) {
+    const key = 'alt.js.org';
+    let context = win;
+    if (!context && typeof window !== 'undefined') {
+      context = window;
+    }
+    if (typeof context !== 'undefined') {
+      context[key] = context[key] || [];
+      context[key].push({ name: name, alt: alt });
+    }
+    return alt;
+  }
+}
 
 module.exports = Alt;
 //# sourceMappingURL=alt.es6.js.map

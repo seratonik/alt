@@ -25,7 +25,6 @@ let Config = {
                 'transform-object-rest-spread',
                 'transform-es2015-destructuring',
                 'transform-es2015-spread',
-                'transform-es2015-classes',
             ]
         })
     ]
